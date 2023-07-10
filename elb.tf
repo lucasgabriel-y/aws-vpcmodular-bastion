@@ -15,7 +15,7 @@ resource "aws_lb_target_group" "alb_target" {
   name     = "target-group"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = aws_vpc.apprds_vpc.id 
+  vpc_id   = aws_vpc.az_vpc.id 
 
   health_check {
     path                = "/"

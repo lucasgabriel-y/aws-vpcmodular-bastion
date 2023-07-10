@@ -1,15 +1,15 @@
 
-resource "aws_vpc" "apprds_vpc" {
+resource "aws_vpc" "az_vpc" {
   cidr_block = "10.0.0.0/16" # Bloco de endereços IP da VPC
 
   tags = {
-    Name = "tf-vpc"
+    Name = "az-vpc"
   }
 }
 
 # Cria uma subnet pública
 resource "aws_subnet" "public_subnet" {
-  vpc_id     = aws_vpc.apprds_vpc.id
+  vpc_id     = aws_vpc.az_vpc.id
   cidr_block = "10.0.1.0/24" # Bloco de endereços IP da subnet
   availability_zone = "us-east-1a"
   tags = {
@@ -19,7 +19,7 @@ resource "aws_subnet" "public_subnet" {
 
 # Cria uma subnet pública
 resource "aws_subnet" "public_subnet_b" {
-  vpc_id     = aws_vpc.apprds_vpc.id
+  vpc_id     = aws_vpc.az_vpc.id
   cidr_block = "10.0.2.0/24" # Bloco de endereços IP da subnet
   availability_zone = "us-east-1b"
   tags = {
@@ -30,7 +30,7 @@ resource "aws_subnet" "public_subnet_b" {
 # Cria um grupo de segurança para a subnet pública
 resource "aws_security_group" "public_security_group" {
   name_prefix = "public_security_group"
-  vpc_id      = aws_vpc.apprds_vpc.id
+  vpc_id      = aws_vpc.az_vpc.id
 
   ingress {
     description = "SSH"
@@ -85,7 +85,7 @@ resource "aws_security_group" "public_security_group" {
 resource "aws_security_group" "elb_sg" {
   name        = "elb_sg"
   description = "Acesso a partir do ELB"
-  vpc_id      = aws_vpc.apprds_vpc.id
+  vpc_id      = aws_vpc.az_vpc.id
 
    ingress {
     from_port   = 0
@@ -111,7 +111,7 @@ resource "aws_security_group" "elb_sg" {
 resource "aws_security_group" "asg_sg" {
   name        = "asg_sg"
   description = "Grupo de Seguranca do ASG"
-  vpc_id      = aws_vpc.apprds_vpc.id
+  vpc_id      = aws_vpc.az_vpc.id
 
     ingress {
     from_port   = 0
@@ -135,7 +135,7 @@ resource "aws_security_group" "asg_sg" {
 resource "aws_security_group" "ec2_sg" {
   name        = "ec2_sg"
   description = "Acesso"
-  vpc_id      = aws_vpc.apprds_vpc.id
+  vpc_id      = aws_vpc.az_vpc.id
 
   ingress {
     from_port   = 0
@@ -160,7 +160,7 @@ resource "aws_security_group" "ec2_sg" {
 
 # Cria uma subnet privada
 resource "aws_subnet" "private_subnet" {
-  vpc_id     = aws_vpc.apprds_vpc.id
+  vpc_id     = aws_vpc.az_vpc.id
   cidr_block = "10.0.3.0/24" # Bloco de endereços IP da subnet
   availability_zone = "us-east-1a"
   tags = {
@@ -168,9 +168,65 @@ resource "aws_subnet" "private_subnet" {
   }
 }
 
-# Cria uma subnet privada
+
+resource "aws_network_acl" "private_subnet_acl" {
+  vpc_id = aws_vpc.az_vpc.id
+
+  subnet_ids = [aws_subnet.private_subnet.id]
+  egress {
+    protocol       = "-1"
+    rule_no        =  300
+    action         = "allow"
+    cidr_block     = "0.0.0.0/0"
+    from_port      = 0
+    to_port        = 0
+  }
+
+
+    egress {
+    protocol       = "tcp"
+        rule_no    =  400
+    action         = "allow"
+    cidr_block     = "10.0.1.0/24"
+    from_port      = 0
+    to_port        = 65535
+  }
+
+    egress {
+    protocol       = "tcp"
+    rule_no        =  500
+    action         = "allow"
+    cidr_block     = "10.0.2.0/24"
+    from_port      = 0
+    to_port        = 65535
+  }
+
+  ingress {
+    protocol       = "tcp"
+        rule_no    =  200
+    action         = "allow"
+    cidr_block     = "10.0.1.0/24"
+    from_port      = 0
+    to_port        = 65535
+  }
+
+    ingress {
+    protocol       = "tcp"
+    rule_no        =  100
+    action         = "allow"
+    cidr_block     = "10.0.2.0/24"
+    from_port      = 0
+    to_port        = 65535
+  }
+
+  tags = {
+    Name = "private-subnet-nacl"
+  }
+}
+
+# Cria uma subnet privada b
 resource "aws_subnet" "private_subnet_b" {
-  vpc_id     = aws_vpc.apprds_vpc.id
+  vpc_id     = aws_vpc.az_vpc.id
   cidr_block = "10.0.4.0/24" # Bloco de endereços IP da subnet
   availability_zone = "us-east-1b"
   tags = {
@@ -178,9 +234,33 @@ resource "aws_subnet" "private_subnet_b" {
   }
 }
 
+#Cria uma tabela de rotas para a subnet privada
+resource "aws_route_table" "private_subnet_route_table" {
+  vpc_id = aws_vpc.az_vpc.id
+
+  tags = {
+    Name = "private-subnet-route-table"
+  }
+}
+
+resource "aws_route_table_association" "private_subnet_association" {
+  subnet_id      = aws_subnet.private_subnet.id
+  route_table_id = aws_route_table.private_subnet_route_table.id
+}
+
+
+#Associa a tabela de rotas a um NAT GW
+resource "aws_route" "private_subnet_route" {
+  route_table_id         = aws_route_table.private_subnet_route_table.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.terraform.id
+}
+
+
+
 # Cria um gateway de internet para a VPC
 resource "aws_internet_gateway" "gateway_internet" {
-  vpc_id = aws_vpc.apprds_vpc.id
+  vpc_id = aws_vpc.az_vpc.id
 
   tags = {
     Name = "gateway_internet"
@@ -189,7 +269,7 @@ resource "aws_internet_gateway" "gateway_internet" {
 
 # Cria uma rota para permitir o tráfego da subnet pública para a Internet
 resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.apprds_vpc.id
+  vpc_id = aws_vpc.az_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"

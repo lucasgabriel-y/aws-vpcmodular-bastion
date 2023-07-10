@@ -15,7 +15,7 @@ resource "aws_autoscaling_group" "asg" {
   max_size         = 3  
   desired_capacity = 2  
   health_check_type = "ELB"
-  vpc_zone_identifier = [aws_subnet.public_subnet.id, aws_subnet.public_subnet_b.id] 
+  vpc_zone_identifier = [aws_subnet.private_subnet.id] 
 
 
   launch_template {
