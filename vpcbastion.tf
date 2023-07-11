@@ -70,6 +70,19 @@ resource "aws_security_group" "bastion_sg" {
   }
 }
 
+
+#Adciona uma rota para a VPC das instancias AZ
+resource "aws_route_table" "subnet_route_table_bastion" {
+  vpc_id = aws_vpc.bastion_vpc.id
+}
+resource "aws_route" "transit_gateway_route_az" {
+  route_table_id            = aws_route_table.public_route_table_bastion.id
+  destination_cidr_block    = "10.0.0.0/16"
+  transit_gateway_id        = aws_ec2_transit_gateway.transit_gateway.id
+}
+
+
+
 # Cria um gateway de internet para a VPC
 resource "aws_internet_gateway" "gateway_internet_bastion" {
   vpc_id = aws_vpc.bastion_vpc.id

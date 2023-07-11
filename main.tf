@@ -23,7 +23,6 @@ resource "aws_instance" "terraform" {
   }
 
 
-
 }
 
 resource "aws_ebs_snapshot" "ec2_snapshot" {

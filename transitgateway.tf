@@ -1,6 +1,6 @@
 # Criação do Transit Gateway
 resource "aws_ec2_transit_gateway" "transit_gateway" {
-  description = "Transit Gateway"
+  description = "Transit Gateway Terraform"
 }
 
 # Criação da associação da VPC 1 ao Transit Gateway
