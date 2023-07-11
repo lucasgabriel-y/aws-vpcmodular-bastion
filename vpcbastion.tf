@@ -82,6 +82,11 @@ resource "aws_route" "transit_gateway_route_az" {
 }
 
 
+resource "aws_route_table_association" "public_subnet_association_bastion" {
+  subnet_id      = aws_subnet.public_subnet_bastion.id
+  route_table_id = aws_route_table.public_route_table_bastion.id
+}
+
 
 # Cria um gateway de internet para a VPC
 resource "aws_internet_gateway" "gateway_internet_bastion" {

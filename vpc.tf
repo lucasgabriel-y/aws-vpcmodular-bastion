@@ -175,7 +175,16 @@ resource "aws_network_acl" "private_subnet_acl" {
   subnet_ids = [aws_subnet.private_subnet.id]
   egress {
     protocol       = "-1"
-    rule_no        =  300
+    rule_no        =  600
+    action         = "allow"
+    cidr_block     = "0.0.0.0/0"
+    from_port      = 0
+    to_port        = 0
+  }
+
+      ingress {
+    protocol       = "-1"
+    rule_no        =  500
     action         = "allow"
     cidr_block     = "0.0.0.0/0"
     from_port      = 0
@@ -194,7 +203,7 @@ resource "aws_network_acl" "private_subnet_acl" {
 
     egress {
     protocol       = "tcp"
-    rule_no        =  500
+    rule_no        =  300
     action         = "allow"
     cidr_block     = "10.0.2.0/24"
     from_port      = 0
@@ -242,6 +251,7 @@ resource "aws_route_table" "private_subnet_route_table" {
     Name = "private-subnet-route-table"
   }
 }
+
 
 resource "aws_route_table_association" "private_subnet_association" {
   subnet_id      = aws_subnet.private_subnet.id

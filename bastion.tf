@@ -20,9 +20,6 @@ resource "aws_instance" "bastion" {
 
 }
 
-
-
-
 #Associa um IP elastico a uma instancia
 resource "aws_eip" "eip" {
   instance = aws_instance.bastion.id
