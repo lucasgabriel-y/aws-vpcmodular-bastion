@@ -4,7 +4,7 @@ provider "aws" {
 
 #Cria o recurso para usar uma chave de acesso  
 resource "aws_key_pair" "key-pair" {
-  key_name   = "tf-app-rds"
+  key_name   = "tf-app"
   public_key = file("/id_rsa.pub")
 
 }
