@@ -161,7 +161,7 @@ resource "aws_security_group" "ec2_sg" {
 # Cria uma subnet privada
 resource "aws_subnet" "private_subnet" {
   vpc_id     = aws_vpc.az_vpc.id
-  cidr_block = "10.0.3.0/24" # Bloco de endereços IP da subnet
+  cidr_block = "10.0.3.0/24"
   availability_zone = "us-east-1a"
   tags = {
     Name = "private_subnet_a"
@@ -191,7 +191,7 @@ resource "aws_network_acl" "private_subnet_acl" {
     to_port        = 0
   }
 
-
+#Regras para liberar o acesso somente através da rede do ELB
     egress {
     protocol       = "tcp"
         rule_no    =  400
@@ -233,7 +233,7 @@ resource "aws_network_acl" "private_subnet_acl" {
   }
 }
 
-# Cria uma subnet privada b
+# Cria uma segunda subnet privada 
 resource "aws_subnet" "private_subnet_b" {
   vpc_id     = aws_vpc.az_vpc.id
   cidr_block = "10.0.4.0/24" # Bloco de endereços IP da subnet
@@ -242,6 +242,8 @@ resource "aws_subnet" "private_subnet_b" {
     Name = "private_subnet_b"
   }
 }
+
+
 
 #Cria uma tabela de rotas para a subnet privada
 resource "aws_route_table" "private_subnet_route_table" {
@@ -253,8 +255,14 @@ resource "aws_route_table" "private_subnet_route_table" {
 }
 
 
-resource "aws_route_table_association" "private_subnet_association" {
+resource "aws_route_table_association" "private_subnet_association_b" {
   subnet_id      = aws_subnet.private_subnet.id
+  route_table_id = aws_route_table.private_subnet_route_table.id
+}
+
+
+resource "aws_route_table_association" "private_subnet_association" {
+  subnet_id      = aws_subnet.private_subnet_b.id
   route_table_id = aws_route_table.private_subnet_route_table.id
 }
 
