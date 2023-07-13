@@ -30,7 +30,7 @@ Este projeto construído em Terraform provisiona uma infraestrutura na AWS para 
 * Execute o comando **terraform apply** para criar a infraestrutura na AWS.
 
 ### Próximos passos:
-* Adiconar um bucket S3 para o armazenamento do conteúdo estático
-* Criar o recurso de VPN para prover mais segurança no acesso entre o Engenheiro DevOps e o Bastion Host 
+* Adiconar um bucket S3 para o armazenamento do conteúdo estático.
+* Criar o recurso de VPN para prover mais segurança no acesso entre o Engenheiro DevOps e o Bastion Host. 
 
 ![AWS](https://i.ibb.co/446h5jy/aws-vpcmodular-bastion-drawio-3.png)
