@@ -33,4 +33,4 @@ Este projeto construído em Terraform provisiona uma infraestrutura na AWS para 
 * Adiconar um bucket S3 para o armazenamento do conteúdo estático.
 * Criar o recurso de VPN para prover mais segurança no acesso entre o Engenheiro DevOps e o Bastion Host. 
 
-![AWS](https://i.ibb.co/446h5jy/aws-vpcmodular-bastion-drawio-3.png)
+![AWS](https://media.licdn.com/dms/image/D4D22AQElRMWdb9iOzw/feedshare-shrink_2048_1536/0/1689173237135?e=1693440000&v=beta&t=RDK_lnskvisTMzNhPLHdL-ZKLuFgUH01P6FhXl64a6o)
